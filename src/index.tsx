@@ -17,49 +17,11 @@ import {EegService} from "./services/eeg.service";
 import TenantProvider from "./hooks/EegContext";
 import {authService} from "./services/auth.service";
 
-// export const userManager = new UserManager({
-//   authority: "http://localhost:8180/auth/realms/vfeeg/",
-//   client_id: "eegfaktura-app",
-//   redirect_uri: "http://localhost:3000",
-//   userStore: new WebStorageStateStore({store: window.sessionStorage}),
-// })
-//
-// export const eegService = new EegService(userManager)
-
 const keycloakConfig = {
   url: "https://login.ourproject.at/auth/realms/VFEEG/",
   client_id: "at.ourproject.vfeeg.admin",
-  // redirect_uri: "https://admin.eegfaktura.at"
-  redirect_uri: "http://localhost:3001"
+  redirect_uri: "https://admin.eegfaktura.at"
 }
-
-const keycloakConfigTest = {
-  url: "http://localhost:8180/auth/realms/vfeeg/",
-  client_id: "eegfaktura-app",
-  redirect_uri: "http://localhost:3000"
-}
-
-
-// const oidcConfig = {
-//   authority: keycloakConfig.url,
-//   client_id: keycloakConfig.client_id,
-//   redirect_uri: keycloakConfig.redirect_uri,
-//   onSigninCallback: (_user: User | void): void => {
-//     window.history.replaceState(
-//       {},
-//       document.title,
-//       window.location.pathname
-//     )
-//   },
-//   revokeAccessTokenOnSignout: true,
-//   userStore: new WebStorageStateStore({
-//     store: sessionStorage
-//   }),
-//
-//   // userManager: userManager,
-//   // ...
-// };
-
 
 const oidcConfig = {
   onSigninCallback: (_user: User | void): void => {
