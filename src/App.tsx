@@ -43,21 +43,6 @@ function App() {
     }
   }, [auth.isAuthenticated, auth.activeNavigator, auth.isLoading, auth.signinRedirect]);
 
-  React.useEffect(() => {
-    // the `return` is important - addAccessTokenExpiring() returns a cleanup function
-    return auth.events.addUserLoaded(cb => {
-      console.log(cb.profile)
-      // console.log("Profile-Tenants", cb.profile['tenants'])
-      // setTenants(cb.profile['tenants'] as string[])
-    })
-  }, [auth.events, auth.signinSilent]);
-  //
-  // if (auth.activeNavigator) {
-  //   return <div>Signing you in/out...</div>;
-  // }
-  // if (!auth.isAuthenticated) {
-  //   return <div>Unable to log in</div>;
-  // }
   return (
     <ThemeProvider theme={theme}>
     <div>
