@@ -84,9 +84,8 @@ const RegistrationPage: FC = () => {
   };
 
   const onSubmit = (data: EegRegister) => {
-    console.log(data)
     try {
-      eegService.registerEeg(data)
+      eegService.registerEeg(trimEegRegisterData(data))
         .then(r => {
           setMessage({message: "Mitglied wurde angelegt!", severity: "success"})
           setOpen(true)
@@ -101,6 +100,37 @@ const RegistrationPage: FC = () => {
       console.log(e)
     }
   };
+
+  const trimEegRegisterData = (data: EegRegister): EegRegister => {
+    data.name = data.name.trim()
+    data.communityId = data.communityId.trim();
+    data.description = data.description.trim();
+    data.salesTax = data.salesTax.trim();
+    data.rcNumber = data.rcNumber.trim();
+    data.settlement = data.settlement.trim();
+    data.accountInfo.iban = data.accountInfo.iban.trim();
+    data.accountInfo.owner = data.accountInfo.owner.trim();
+    data.contact.contactPerson = data.contact.contactPerson.trim();
+    data.contact.city = data.contact.city.trim();
+    data.contact.phone = data.contact.phone.trim();
+    data.contact.owner = data.contact.owner.trim();
+    data.contact.email = data.contact.email.trim();
+    data.contact.streetNumber = data.contact.streetNumber.trim();
+    data.contact.zip = data.contact.zip.trim();
+    data.contact.street = data.contact.street.trim();
+    data.pontonInfo.host = data.pontonInfo.host.trim();
+    data.pontonInfo.domain = data.pontonInfo.domain.trim();
+    data.grid.name = data.grid.name.trim();
+    data.grid.id = data.grid.id.trim();
+    data.businessInfo.businessNr = data.businessInfo.businessNr.trim();
+    data.businessInfo.taxNumber = data.businessInfo.taxNumber.trim();
+    data.businessInfo.vatNumber = data.businessInfo.vatNumber.trim();
+    data.user.email = data.user.email.trim();
+    data.user.firstname = data.user.firstname.trim();
+    data.user.lastname = data.user.lastname.trim();
+
+    return data;
+  }
 
   const renderStep = (currentStep: number) => {
     switch(currentStep) {
