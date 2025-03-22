@@ -5,7 +5,7 @@ NPMBUILD=$(NPMCMD) run build
 
 BINARY_NAME=eeg-registration-frontend
 DOCKER=docker
-VERSION=latest
+VERSION=v0.0.3
 
 all: test build
 build:

@@ -1,12 +1,12 @@
 import {User, UserManager, UserManagerSettings, WebStorageStateStore} from "oidc-client-ts";
+import {keycloakConfig} from "../keycloak";
 
-
-const keycloakConfig = {
-  url: "https://login.ourproject.at/auth/realms/VFEEG/",
-  client_id: "at.ourproject.vfeeg.admin",
-  // redirect_uri: "https://admin.eegfaktura.at"
-  redirect_uri: "http://localhost:3000",
-}
+// const keycloakConfig = {
+//   url: "https://login.ourproject.at/auth/realms/VFEEG/",
+//   client_id: "at.ourproject.vfeeg.admin",
+//   redirect_uri: "https://admin.eegfaktura.at"
+//   // redirect_uri: "http://localhost:3000",
+// }
 
 const oidcConfig = {
   authority: keycloakConfig.url,
