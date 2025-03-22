@@ -3,7 +3,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 module.exports = function(app) {
     app.use(
         createProxyMiddleware(['/admin'], {
-            target: 'http://localhost:8095',
+            target: 'http://localhost:8085',
             changeOrigin: true,
             pathRewrite: {'^/admin' : '/'},
             headers: {

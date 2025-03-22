@@ -1,5 +1,6 @@
 import React, {FC} from "react";
-import {Control, Controller, FieldErrors, useController, useWatch} from "react-hook-form";
+import {Control, Controller} from "react-hook-form";
+
 import FormInputComponent from "../form/FormInput.component";
 import FormSelectComponent from "../form/FormSelect.component";
 import {Box, FormControlLabel, Switch} from "@mui/material";
@@ -13,7 +14,7 @@ interface BusinessEegPropertiesComponentProps {
 
 const BusinessEegPropertiesComponent: FC<BusinessEegPropertiesComponentProps> = ({control}) => {
   return (
-    <Box className={"flex-col-mgap"} style={{padding: "16px"}}>
+    <Box className={"flex-col-mgap"} style={{padding: "16px"}} bgcolor={"background.paper"}>
     {/*<CorePageTemplate>*/}
       <h2>Geschäftliches</h2>
       <FormInputComponent name={"businessInfo.businessNr"} label="Geschäftsnummer" control={control} type="text" placeholder="Geschäftsnummer deiner EEG"/>

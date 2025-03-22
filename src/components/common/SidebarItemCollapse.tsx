@@ -15,7 +15,7 @@ type Props = {
 const SidebarItemCollapse = ({ item }: Props) => {
   const [open, setOpen] = useState(false);
 
-  const { appState } = useSelector((state: RootState) => state.appState);
+  const { appState } = useSelector((state: RootState) => state.appStateSlice);
 
   useEffect(() => {
     if (appState.includes(item.state)) {

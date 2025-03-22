@@ -2,7 +2,7 @@ import React, {FC, useState} from "react";
 import {Box, Button, Snackbar, Step, StepLabel, Stepper, Typography} from "@mui/material";
 
 import {Swiper, SwiperSlide, SwiperClass} from "swiper/react";
-import {useForm} from "react-hook-form";
+import {FormProvider, useForm} from "react-hook-form";
 import {AccountInfo, Address, Contact, EegRegister, Optionals} from "../../model/eeg.model";
 import CommonEegPropertiesComponent from "../../components/registration/CommonEegProperties.component";
 import {Navigation, Pagination} from "swiper";
@@ -10,30 +10,31 @@ import BusinessEegPropertiesComponent from "../../components/registration/Busine
 import AddressEegPropertiesComponent from "../../components/registration/AddressEegProperties.component";
 import UserEegPropertiesComponent from "../../components/registration/UserEegProperties.component";
 import PontonPropertiesComponent from "../../components/registration/PontonProperties.component";
-import {eegService} from "../../services/eeg.service";
+import {Api} from "../../services/eeg.service";
 
 
 const RegistrationPage: FC = () => {
   const [swiperInstance, setSwiperInstance] = useState<SwiperClass>();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
 
-  const newEeg: EegRegister = {rcNumber: "", communityId: "", online: false, name: "", salesTax: "", settlement: "", description: "",
+  const newEeg: EegRegister = {tenant: "", rcNumber: "", communityId: "", online: false, name: "", salesTax: "", settlement: "", description: "",
     user: {firstname: "", lastname: "", email: "", username: "", password: "", confirmPassword: ""},
     businessInfo: {legal: "verein", taxNumber: "", vatNumber: "", businessNr: "", settlementInterval: "MONTHLY"},
     grid: {id: "", name: "", area: "LOCAL", allocation: "DYNAMIC"},
-    pontonInfo: {host: "", password: "", username: "", port: 0, confirmPassword: "", domain: "edanet.at"},
+    pontonInfo: {host: "", password: "", username: "", port: 0, confirmPassword: "", domain: "edanet.at", pontonCommType: "KEP"},
     accountInfo: {iban: "", sepa: false, owner:"", bankName: ""} as AccountInfo,
     contact: {street:"", city: "", zip: "", streetNumber: "", web: "", email: "", phone: "", owner: "", contactPerson: ""},
   }
   const steps: {label: string, optional?: boolean}[] = [
     {label: 'Common'},
-    {label: 'Business'},
     {label: 'User'},
+    {label: 'Business'},
     {label: 'Contact'},
     {label: 'Interface'},
   ];
 
-  const {handleSubmit, control, watch, formState: {errors}, reset} = useForm<EegRegister>({defaultValues: newEeg})
+  // const {handleSubmit, control, watch, formState: {errors}, reset} = useForm<EegRegister>({defaultValues: newEeg})
+  const formMethods = useForm<EegRegister>({defaultValues: newEeg})
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [message, setMessage] = React.useState({message: "", severity: "success"});
@@ -41,7 +42,7 @@ const RegistrationPage: FC = () => {
 
   const isStepOptional = (index: number) => {
     const step = steps[index]
-    return step.optional && step.optional === true;
+    return step.optional && step.optional;
   };
 
   const isStepSkipped = (step: number) => {
@@ -80,12 +81,13 @@ const RegistrationPage: FC = () => {
 
   const handleReset = () => {
     setActiveStep(0);
-    reset();
+    formMethods.reset();
   };
 
   const onSubmit = (data: EegRegister) => {
     try {
-      eegService.registerEeg(trimEegRegisterData(data))
+      Api.eegService.registerEeg(trimEegRegisterData(data))
+
         .then(r => {
           setMessage({message: "Mitglied wurde angelegt!", severity: "success"})
           setOpen(true)
@@ -135,25 +137,26 @@ const RegistrationPage: FC = () => {
   const renderStep = (currentStep: number) => {
     switch(currentStep) {
       case 0:
-        return <CommonEegPropertiesComponent control={control}/>
+        return <CommonEegPropertiesComponent />
       case 1:
-        return <BusinessEegPropertiesComponent control={control}/>
+        return <UserEegPropertiesComponent control={formMethods.control} watch={formMethods.watch}/>
       case 2:
-        return <UserEegPropertiesComponent control={control} watch={watch}/>
+        return <BusinessEegPropertiesComponent control={formMethods.control}/>
       case 3:
-        return <AddressEegPropertiesComponent control={control}/>
+        return <AddressEegPropertiesComponent control={formMethods.control}/>
       case 4:
-        return <PontonPropertiesComponent control={control} watch={watch}/>
+        return <PontonPropertiesComponent control={formMethods.control} watch={formMethods.watch}/>
       default:
         return <></>
     }
   }
 
   return (
-    <Box display="flex" flexDirection="column" height="100%" color={"primary"}>
+    <Box display="flex" flexDirection="column" height="100%" color={"primary.main"} bgcolor={"background.paper"}>
       <Snackbar autoHideDuration={2000} open={open} onClose={() => setOpen(false)} message={message.message} security={message.severity}/>
         {/*<div style={{display: "flex", flexDirection: "column", height: "100%", width: "100%"}}>*/}
           {/*<div className="parent">*/}
+            <FormProvider {...formMethods} >
             <div style={{flex: "1 1 auto"}}>
               <Stepper activeStep={activeStep}>
                 {steps.map((step:{label: string, optional?: boolean}, index) => {
@@ -176,13 +179,14 @@ const RegistrationPage: FC = () => {
                   );
                 })}
               </Stepper>
-              {Object.values(errors).map((e, i) => (
+              {Object.values(formMethods.formState.errors).map((e, i) => (
                 <div>{e.message}</div>
               ))}
               {renderStep(activeStep)}
             </div>
-            <div style={{flex: "0 1 40px"}}>
-              <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+            </FormProvider>
+            <div style={{flex: "0 1 40px", paddingBottom: "10px"}}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2}}>
                 <Button
                   color="inherit"
                   disabled={activeStep === 0}
@@ -198,10 +202,10 @@ const RegistrationPage: FC = () => {
                   </Button>
                 )}
                 {(activeStep === steps.length - 1) ?
-                  (<Button onClick={handleSubmit(onSubmit)}>
+                  (<Button variant="contained" onClick={formMethods.handleSubmit(onSubmit)}>
                     Finish
                   </Button>) :
-                  (<Button onClick={handleNext}>
+                  (<Button variant="outlined" onClick={handleNext}>
                     Next
                   </Button>)
                 }

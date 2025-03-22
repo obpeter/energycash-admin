@@ -4,54 +4,73 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import {ReactKeycloakProvider} from '@react-keycloak/web'
-
-import {AuthClientInitOptions} from "@react-keycloak/core/lib/types";
 import {store} from './redux/store';
 import {Provider} from "react-redux";
 import {CssBaseline} from "@mui/material";
-import Keycloak from "keycloak-js";
-import {AuthProvider} from "react-oidc-context";
-import {User, UserManager, WebStorageStateStore} from "oidc-client-ts";
-import {EegService} from "./services/eeg.service";
+
+import {Api, EegService} from "./services/eeg.service";
 import TenantProvider from "./hooks/EegContext";
-import {authService} from "./services/auth.service";
+import {OidcProvider} from "./components/layout/OidcProvider";
+import {AppConfig, globalConfigUrl} from "./config";
+import {UserManager, UserManagerSettings} from "oidc-client-ts";
+import {AuthService} from "./services/auth.service";
 
-const keycloakConfig = {
-  url: "https://login.ourproject.at/auth/realms/VFEEG/",
-  client_id: "at.ourproject.vfeeg.admin",
-  redirect_uri: "https://admin.eegfaktura.at"
+const initApiServices = (config: AppConfig): UserManager => {
+
+  const userManagerConfig = {
+    authority: `${config.authServerUrl.replace(/\/+$/, "")}/realms/${config.realm}/`,
+    client_id: config.resource,
+    redirect_uri: window.location.origin,
+    automaticSilentRenew: false,
+  } as UserManagerSettings;
+
+  const authService = new AuthService(userManagerConfig)
+
+  Api.eegService = new EegService(authService)
+
+
+  return authService as UserManager
 }
-
-const oidcConfig = {
-  onSigninCallback: (_user: User | void): void => {
-    window.history.replaceState(
-      {},
-      document.title,
-      window.location.pathname
-    )
-  },
-
-  userManager: authService,
-};
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <AuthProvider {...oidcConfig}>
-        <TenantProvider>
-          <CssBaseline/>
-          <App/>
-        </TenantProvider>
-      </AuthProvider>
-    </Provider>
-  </React.StrictMode>
-);
+fetch(globalConfigUrl)
+  .then(c => c.json())
+  .then(c => {
+    const appC = c["admin"]
+    return {
+      authServerUrl: appC["auth-server-url"],
+      realm: appC.realm,
+      resource: appC.resource,
+    } as AppConfig
+  })
+  .then(keycloakConfig => {
+    const userManager = initApiServices(keycloakConfig)
 
+    root.render(
+      <React.StrictMode>
+        <Provider store={store}>
+          <OidcProvider _userManager={userManager}>
+            <TenantProvider>
+              <CssBaseline/>
+              <App/>
+            </TenantProvider>
+          </OidcProvider>
+          {/*</AuthProvider>*/}
+        </Provider>
+      </React.StrictMode>
+    );
+  })
+  .catch(e => {
+    console.log(e)
+    root.render(
+      <React.StrictMode>
+        <p>Ops... Something went wrong. Try again!</p>
+      </React.StrictMode>
+    )
+  })
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals

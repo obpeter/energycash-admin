@@ -12,7 +12,7 @@ type Props = {
 
 const SidebarItem = ({ item }: Props) => {
   const theme = useTheme()
-  const { appState } = useSelector((state: RootState) => state.appState);
+  const { appState } = useSelector((state: RootState) => state.appStateSlice);
 
   return (
     item.sidebarProps && item.path ? (
