@@ -1,14 +1,22 @@
-import {EegRegister, EegUsers, PontonRegister} from "../model/eeg.model";
+import {Eeg, EegMember, EegRegister, EegUsers, PontonRegister} from "../model/eeg.model";
 import {useAuth} from "react-oidc-context";
 import {User, UserManager} from "oidc-client-ts";
-import {authService} from "./auth.service";
+import {AuthService} from "./auth.service";
+// import {authService} from "./auth.service";
 
 
 const ADMIN_API_SERVER = process.env.REACT_APP_ADMIN_SERVER_URL;
 
+interface IApi {
+  eegService: EegService
+}
+
+export const Api = {} as IApi
+
+
 export class EegService {
 
-  public constructor(authService: UserManager) {
+  public constructor(private authService: AuthService) {
   }
 
 
@@ -22,7 +30,7 @@ export class EegService {
   // }
 
   private async getUser() {
-    return authService.getToken()
+    return this.authService.getToken()
   }
   private getSecureHeaders(tenant: string, token?: string) {
     return {'Authorization': `Bearer ${token}`, "tenant": tenant}
@@ -90,13 +98,29 @@ export class EegService {
       }
     });
   }
+
+  async getEeg(): Promise<EegMember[]> {
+    const token = await this.getUser()
+    // const token = "1234"
+    return await fetch(`${ADMIN_API_SERVER}/vfeeg/eeg`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    }).then(this.handleErrors).then(async res => {
+      if (res.status === 200) {
+        const data = await res.json();
+        return data;
+      }
+    });
+  }
 }
-export const eegService = new EegService(authService);
-
-export const useToken = () => {
-  const auth = useAuth()
-
-  const token = auth.user?.access_token
-
-  return token
-}
+// export const eegService = new EegService(authService);
+//
+// export const useToken = () => {
+//   const auth = useAuth()
+//
+//   const token = auth.user?.access_token
+//
+//   return token
+// }

@@ -1,5 +1,5 @@
 import React, {FC} from "react";
-import {Control, Controller, FieldErrors} from "react-hook-form";
+import {Control, Controller} from "react-hook-form";
 import FormInputComponent from "../form/FormInput.component";
 import FormSelectComponent from "../form/FormSelect.component";
 import {Box, FormControlLabel, Switch} from "@mui/material";
@@ -13,7 +13,7 @@ interface BusinessEegPropertiesComponentProps {
 const BusinessEegPropertiesComponent: FC<BusinessEegPropertiesComponentProps> = ({control}) => {
 
   return (
-    <Box className={"flex-col-mgap"} style={{padding: "16px"}}>
+    <Box className={"flex-col-mgap"} style={{padding: "16px"}} bgcolor={"background.paper"}>
     {/*<CorePageTemplate>*/}
       <h2>Geschäftliches</h2>
       <FormInputComponent name={"businessInfo.businessNr"} label="Geschäftsnummer" control={control} type="text" placeholder="Geschäftsnummer deiner EEG"/>
@@ -28,9 +28,9 @@ const BusinessEegPropertiesComponent: FC<BusinessEegPropertiesComponentProps> = 
         {key: "BIANNUAL", value: "Halbjährlich"},
         {key: "ANNUAL", value: "Jährlich"},
       ]}></FormSelectComponent>
-      <FormInputComponent name={"accountInfo.iban"} label="IBAN" control={control} type="text"/>
-      <FormInputComponent name={"accountInfo.owner"} label="Konto Inhaber" control={control} type="text"/>
-      <FormInputComponent name={"accountInfo.bankName"} label="Bankname" control={control} type="text"/>
+      <FormInputComponent name={"accountInfo.iban"} label="IBAN" control={control} type="text" rules={{required: "IBAN"}}/>
+      <FormInputComponent name={"accountInfo.owner"} label="Konto Inhaber" control={control} type="text" rules={{required: "Konto Inhaber"}}/>
+      <FormInputComponent name={"accountInfo.bankName"} label="Bankname" control={control} type="text" rules={{required: "Bankname"}}/>
       <FormControlLabel control={
         <Controller
           name={"accountInfo.sepa"}

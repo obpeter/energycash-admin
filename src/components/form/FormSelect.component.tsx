@@ -11,16 +11,17 @@ interface FormSelectComponentProps {
   options: { key: any, value: string }[];
   placeholder?: string;
   size?: 'small' | 'medium' | undefined;
+  disabled?: boolean;
 }
 
-const FormSelectComponent: FC<FormSelectComponentProps> = ({control, rules, label, name, options, ...rest}) => {
+const FormSelectComponent: FC<FormSelectComponentProps> = ({control, rules, label, name, options, disabled, ...rest}) => {
   return (
     <FormControl>
       <InputLabel htmlFor={"component-outlined-"+name}>{label}</InputLabel>
       <Controller
         name={name}
         control={control}
-        rules={rules}
+        rules={disabled ? undefined : rules}
         render={({
                    field: { onChange, value },
                    fieldState: { error },
@@ -31,6 +32,7 @@ const FormSelectComponent: FC<FormSelectComponentProps> = ({control, rules, labe
             onChange={onChange}
             label={label}
             value={value}
+            disabled={disabled}
             {...rest}
           >
             {options.map((o, i) =>(

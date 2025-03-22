@@ -1,5 +1,6 @@
 
 export interface Eeg {
+  tenant: string,
   name: string;
   rcNumber: string;
   salesTax: string;
@@ -49,18 +50,14 @@ export interface EegPonton {
     password: string
     confirmPassword: string
     domain: string
+    pontonCommType: string
   }
 }
 
 export type EegRegister = Eeg & EegOwner & EegPonton & EegBusiness & EegGrid
 
 export interface EegTenant { tenant: string}
-export interface PontonRegister {
-  tenant: string,
-  username: string,
-  password: string,
-  domain: string
-}
+export type PontonRegister = EegTenant & EegPonton
 
 export interface Address {
   street: string;
@@ -221,4 +218,18 @@ export interface EegUsers {
   firstname: string;
   lastname: string;
   email: string;
+}
+
+export interface EegMember {
+  name: string;
+  tenant: string;
+  description: string;
+  legal: string;
+  area: "LOCAL" | "REGIONAL" | "BEG" | "GEA";
+  gridOperatorName: string;
+  gridOperatorId: string;
+  contactPerson: string;
+  settlementInterval: 'MONTHLY' | "ANNUAL" | "BIANNUAL" | "QUARTER";
+  allocationMode: "DYNAMIC" | "STATIC"
+  online: boolean;
 }

@@ -10,7 +10,7 @@ interface AddressEegPropertiesComponentProps {
 
 const AddressEegPropertiesComponent: FC<AddressEegPropertiesComponentProps> = ({control}) => {
   return (
-    <Box className={"flex-col-mgap"} style={{padding: "16px"}}>
+    <Box className={"flex-col-mgap"} style={{padding: "16px"}} bgcolor={"background.paper"}>
       <h2>Kontakt Einstellungen Erneuerbarer Energie Gemeinschaften</h2>
       <FormInputComponent name={"contact.owner"} label="Kontaktperson" control={control} rules={{required: "Kontaktperson fehlt"}} type="text" />
       <FormInputComponent name={"contact.street"} label="Straße" control={control} rules={{required: "Straße fehlt"}} type="text" />

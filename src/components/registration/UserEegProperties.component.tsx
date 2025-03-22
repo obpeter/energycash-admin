@@ -14,7 +14,7 @@ const UserEegPropertiesComponent: FC<UserEegPropertiesComponentProps> = ({contro
   const [eegOnline, setEegOnline] = useState<boolean>(false)
 
   return (
-    <Box className={"flex-col-mgap"} style={{padding: "16px"}}>
+    <Box className={"flex-col-mgap"} style={{padding: "16px"}} bgcolor={"background.paper"}>
     {/*<CorePageTemplate>*/}
       <h2>EEG Besitzer</h2>
       <FormInputComponent name={"user.firstname"} label="Vorname" control={control} type="text" rules={{required: "Vorname fehlt"}}/>
