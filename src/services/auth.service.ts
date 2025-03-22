@@ -7,6 +7,7 @@ import {UserManager, UserManagerSettings, WebStorageStateStore} from "oidc-clien
 //   client_id: "at.ourproject.vfeeg.admin",
 //   // redirect_uri: "https://admin.eegfaktura.at"
 //   redirect_uri: "http://localhost:3000",
+
 // }
 
 // const oidcConfig = {

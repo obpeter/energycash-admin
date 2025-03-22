@@ -28,6 +28,7 @@ const initApiServices = (config: AppConfig): UserManager => {
 
   Api.eegService = new EegService(authService)
 
+
   return authService as UserManager
 }
 

@@ -1,9 +1,11 @@
 import React, {FC} from "react";
 import {Control, Controller} from "react-hook-form";
+
 import FormInputComponent from "../form/FormInput.component";
 import FormSelectComponent from "../form/FormSelect.component";
 import {Box, FormControlLabel, Switch} from "@mui/material";
 import {EegRegister} from "../../model/eeg.model";
+import getFieldValue from "react-hook-form/dist/logic/getFieldValue";
 
 
 interface BusinessEegPropertiesComponentProps {
@@ -11,7 +13,6 @@ interface BusinessEegPropertiesComponentProps {
 }
 
 const BusinessEegPropertiesComponent: FC<BusinessEegPropertiesComponentProps> = ({control}) => {
-
   return (
     <Box className={"flex-col-mgap"} style={{padding: "16px"}} bgcolor={"background.paper"}>
     {/*<CorePageTemplate>*/}

@@ -85,9 +85,9 @@ const RegistrationPage: FC = () => {
   };
 
   const onSubmit = (data: EegRegister) => {
-    console.log(data)
     try {
       Api.eegService.registerEeg(trimEegRegisterData(data))
+
         .then(r => {
           setMessage({message: "Mitglied wurde angelegt!", severity: "success"})
           setOpen(true)

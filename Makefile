@@ -7,6 +7,7 @@ BINARY_NAME=eeg-registration-frontend
 DOCKER=docker
 VERSION=v0.2.4
 
+
 all: test build
 build:
 	$(NPMCMD) run build
