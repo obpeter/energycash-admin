@@ -1,5 +1,5 @@
 import React, {FC} from "react";
-import {Control, FieldErrors} from "react-hook-form";
+import {Control, FieldErrors, useFormContext} from "react-hook-form";
 import { EegRegister } from "../../model/eeg.model";
 import FormInputComponent from "../form/FormInput.component";
 import {Box} from "@mui/material";
@@ -8,11 +8,13 @@ interface AddressEegPropertiesComponentProps {
   control: Control<EegRegister, any>
 }
 
-const AddressEegPropertiesComponent: FC<AddressEegPropertiesComponentProps> = ({control}) => {
+// const AddressEegPropertiesComponent: FC<AddressEegPropertiesComponentProps> = ({control}) => {
+const AddressEegPropertiesComponent: FC = () => {
+  const {control} = useFormContext();
   return (
     <Box className={"flex-col-mgap"} style={{padding: "16px"}} bgcolor={"background.paper"}>
       <h2>Kontakt Einstellungen Erneuerbarer Energie Gemeinschaften</h2>
-      <FormInputComponent name={"contact.owner"} label="Kontaktperson" control={control} rules={{required: "Kontaktperson fehlt"}} type="text" />
+      <FormInputComponent name={"contact.owner"} label="Kontaktperson" control={control} rules={{required: {value: true, message: "Kontaktperson fehlt"}}} type="text" />
       <FormInputComponent name={"contact.street"} label="Straße" control={control} rules={{required: "Straße fehlt"}} type="text" />
       <FormInputComponent name={"contact.streetNumber"} label="Hausnummer" control={control} rules={{required: "Hausnummer fehlt"}} type="text" />
       <FormInputComponent name={"contact.city"} label="Ort" control={control} rules={{required: "Ort fehlt"}} type="text" />

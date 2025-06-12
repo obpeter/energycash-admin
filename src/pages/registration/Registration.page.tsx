@@ -17,15 +17,34 @@ const RegistrationPage: FC = () => {
   const [swiperInstance, setSwiperInstance] = useState<SwiperClass>();
   const [open, setOpen] = React.useState(false);
 
-  const newEeg: EegRegister = {tenant: "", rcNumber: "", communityId: "", online: false, name: "", salesTax: "", settlement: "", description: "",
+  const newEeg: EegRegister = {
+    tenant: "", rcNumber: "", communityId: "", online: false, name: "", salesTax: "", settlement: "", description: "",
     user: {firstname: "", lastname: "", email: "", username: "", password: "", confirmPassword: ""},
     businessInfo: {legal: "verein", taxNumber: "", vatNumber: "", businessNr: "", settlementInterval: "MONTHLY"},
     grid: {id: "", name: "", area: "LOCAL", allocation: "DYNAMIC"},
-    pontonInfo: {host: "", password: "", username: "", port: 0, confirmPassword: "", domain: "edanet.at", pontonCommType: "KEP"},
-    accountInfo: {iban: "", sepa: false, owner:"", bankName: ""} as AccountInfo,
-    contact: {street:"", city: "", zip: "", streetNumber: "", web: "", email: "", phone: "", owner: "", contactPerson: ""},
+    pontonInfo: {
+      host: "",
+      password: "",
+      username: "",
+      port: 0,
+      confirmPassword: "",
+      domain: "edanet.at",
+      pontonCommType: "KEP"
+    },
+    accountInfo: {iban: "", sepa: false, owner: "", bankName: ""} as AccountInfo,
+    contact: {
+      street: "",
+      city: "",
+      zip: "",
+      streetNumber: "",
+      web: "",
+      email: "",
+      phone: "",
+      owner: "",
+      contactPerson: ""
+    },
   }
-  const steps: {label: string, optional?: boolean}[] = [
+  const steps: { label: string, optional?: boolean }[] = [
     {label: 'Common'},
     {label: 'User'},
     {label: 'Business'},
@@ -34,7 +53,7 @@ const RegistrationPage: FC = () => {
   ];
 
   // const {handleSubmit, control, watch, formState: {errors}, reset} = useForm<EegRegister>({defaultValues: newEeg})
-  const formMethods = useForm<EegRegister>({defaultValues: newEeg})
+  const formMethods = useForm<EegRegister>({defaultValues: newEeg, mode: "all"});
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [message, setMessage] = React.useState({message: "", severity: "success"});
@@ -135,15 +154,15 @@ const RegistrationPage: FC = () => {
   }
 
   const renderStep = (currentStep: number) => {
-    switch(currentStep) {
+    switch (currentStep) {
       case 0:
-        return <CommonEegPropertiesComponent />
+        return <CommonEegPropertiesComponent/>
       case 1:
         return <UserEegPropertiesComponent control={formMethods.control} watch={formMethods.watch}/>
       case 2:
         return <BusinessEegPropertiesComponent control={formMethods.control}/>
       case 3:
-        return <AddressEegPropertiesComponent control={formMethods.control}/>
+        return <AddressEegPropertiesComponent />
       case 4:
         return <PontonPropertiesComponent control={formMethods.control} watch={formMethods.watch}/>
       default:
@@ -152,67 +171,65 @@ const RegistrationPage: FC = () => {
   }
 
   return (
-    <Box display="flex" flexDirection="column" height="100%" color={"primary.main"} bgcolor={"background.paper"}>
-      <Snackbar autoHideDuration={2000} open={open} onClose={() => setOpen(false)} message={message.message} security={message.severity}/>
-        {/*<div style={{display: "flex", flexDirection: "column", height: "100%", width: "100%"}}>*/}
-          {/*<div className="parent">*/}
-            <FormProvider {...formMethods} >
-            <div style={{flex: "1 1 auto"}}>
-              <Stepper activeStep={activeStep}>
-                {steps.map((step:{label: string, optional?: boolean}, index) => {
-                  const stepProps: { completed?: boolean } = {};
-                  const labelProps: {
-                    optional?: React.ReactNode;
-                  } = {};
-                  if (isStepOptional(index)) {
-                    labelProps.optional = (
-                      <Typography variant="caption">Optional</Typography>
-                    );
-                  }
-                  if (isStepSkipped(index)) {
-                    stepProps.completed = false;
-                  }
-                  return (
-                    <Step key={step.label} {...stepProps}>
-                      <StepLabel {...labelProps}>{step.label}</StepLabel>
-                    </Step>
-                  );
-                })}
-              </Stepper>
-              {Object.values(formMethods.formState.errors).map((e, i) => (
-                <div>{e.message}</div>
-              ))}
-              {renderStep(activeStep)}
-            </div>
-            </FormProvider>
-            <div style={{flex: "0 1 40px", paddingBottom: "10px"}}>
-              <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2}}>
-                <Button
-                  color="inherit"
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  sx={{ mr: 1 }}
-                >
-                  Back
-                </Button>
-                <Box sx={{ flex: '1 1 auto' }} />
-                {isStepOptional(activeStep) && (
-                  <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                    Skip
-                  </Button>
-                )}
-                {(activeStep === steps.length - 1) ?
-                  (<Button variant="contained" onClick={formMethods.handleSubmit(onSubmit)}>
-                    Finish
-                  </Button>) :
-                  (<Button variant="outlined" onClick={handleNext}>
-                    Next
-                  </Button>)
-                }
-              </Box>
-            </div>
-          {/*</div>*/}
-        {/*</div>*/}
+    <Box display="flex" flexDirection="column" height="100%" color={"primary.main"} bgcolor={"background.paper"} overflow={"auto"} margin={"24px"}>
+      <Snackbar autoHideDuration={2000} open={open} onClose={() => setOpen(false)} message={message.message}
+                security={message.severity}/>
+      <FormProvider {...formMethods} >
+        <div style={{flex: "1 1 auto"}}>
+          <Stepper activeStep={activeStep}>
+            {steps.map((step: { label: string, optional?: boolean }, index) => {
+              const stepProps: { completed?: boolean } = {};
+              const labelProps: {
+                optional?: React.ReactNode;
+              } = {};
+              if (isStepOptional(index)) {
+                labelProps.optional = (
+                  <Typography variant="caption">Optional</Typography>
+                );
+              }
+              if (isStepSkipped(index)) {
+                stepProps.completed = false;
+              }
+              return (
+                <Step key={step.label} {...stepProps}>
+                  <StepLabel {...labelProps}>{step.label}</StepLabel>
+                </Step>
+              );
+            })}
+          </Stepper>
+          {/*{Object.values(formMethods.formState.errors).map((e, i) => (*/}
+          {/*  <div>{e.message}</div>*/}
+          {/*))}*/}
+          {renderStep(activeStep)}
+        </div>
+        <div style={{flex: "0 1 40px", paddingBottom: "10px"}}>
+          <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
+            <Button
+              color="inherit"
+              disabled={activeStep === 0}
+              onClick={handleBack}
+              sx={{mr: 1}}
+            >
+              Back
+            </Button>
+            <Box sx={{flex: '1 1 auto'}}/>
+            {isStepOptional(activeStep) && (
+              <Button color="inherit" onClick={handleSkip} sx={{mr: 1}}>
+                Skip
+              </Button>
+            )}
+            {(activeStep === steps.length - 1) ?
+              (<Button variant="contained" onClick={formMethods.handleSubmit(onSubmit)}>
+                Finish
+              </Button>) :
+              (<Button variant="outlined" onClick={formMethods.handleSubmit(handleNext)}>
+                Next
+              </Button>)
+            }
+          </Box>
+          <span></span>
+        </div>
+      </FormProvider>
     </Box>
   )
 }

@@ -20,6 +20,8 @@ export const themeOptions: ThemeOptions = {
   palette: {
     primary: {
       main: '#2B6860',
+      light: '#88dcb6',
+      contrastText: '#b9bab9',
     },
     secondary: {
       main: '#dc631e',

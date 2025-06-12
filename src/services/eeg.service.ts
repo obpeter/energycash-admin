@@ -1,7 +1,8 @@
-import {Eeg, EegMember, EegRegister, EegUsers, PontonRegister} from "../model/eeg.model";
+import {Eeg, EegMember, EegParticipant, EegRegister, EegUsers, PontonRegister} from "../model/eeg.model";
 import {useAuth} from "react-oidc-context";
 import {User, UserManager} from "oidc-client-ts";
 import {AuthService} from "./auth.service";
+import {PortalService} from "./portal.service";
 // import {authService} from "./auth.service";
 
 
@@ -9,6 +10,7 @@ const ADMIN_API_SERVER = process.env.REACT_APP_ADMIN_SERVER_URL;
 
 interface IApi {
   eegService: EegService
+  portalService: PortalService
 }
 
 export const Api = {} as IApi
@@ -103,6 +105,22 @@ export class EegService {
     const token = await this.getUser()
     // const token = "1234"
     return await fetch(`${ADMIN_API_SERVER}/vfeeg/eeg`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    }).then(this.handleErrors).then(async res => {
+      if (res.status === 200) {
+        const data = await res.json();
+        return data;
+      }
+    });
+  }
+
+  async getParticipants(tenant: string): Promise<EegParticipant[]> {
+    const token = await this.getUser()
+    // const token = "1234"
+    return await fetch(`${ADMIN_API_SERVER}/vfeeg/participants?tenant=${tenant}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`

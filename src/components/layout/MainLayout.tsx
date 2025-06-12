@@ -7,7 +7,7 @@ import Sidebar from "../common/Sidebar";
 const MainLayout = () => {
   const theme = useTheme()
   return (
-    <Box sx={{ display: "flex" }} maxHeight="100vh" overflow="auto">
+    <Box sx={{ display: "flex" }} maxHeight="100vh">
       {/*<Topbar />*/}
       <Box
         component="nav"
@@ -22,11 +22,11 @@ const MainLayout = () => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          // p: 3,
           width: `calc(100% - ${sizeConfigs.sidebar.width})`,
           minHeight: "100vh",
           maxHeight: "100vh",
-          overview: "auto",
+          // overview: "auto",
           backgroundColor: colorConfigs.mainBg
         }}
       >

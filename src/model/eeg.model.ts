@@ -233,3 +233,65 @@ export interface EegMember {
   allocationMode: "DYNAMIC" | "STATIC"
   online: boolean;
 }
+export interface EegParticipant {
+  tenant: string;
+  id: string;
+  participantSince: Date
+  firstName: string;
+  lastName: string;
+  meters: Metering[];
+  status: 'NEW' | 'PENDING' | 'ACTIVE' | 'DISUSED'
+  role: 'EEG_ADMIN' | 'EEG_USER'
+  businessRole: 'EEG_PRIVATE' | 'EEG_BUSINESS'
+}
+
+export interface ContractInfo {
+  id: string;
+  userId: string;
+  name: string;
+  fileCategory: string;
+  fileDownloadUri: string;
+  createdAt: string;
+}
+
+export interface ParticipantState {
+  activeSince: Date
+  inactiveSince: Date
+}
+export type MeteringStateType = "INIT" | "ACTIVE" | "INACTIVE"
+export type MeteringProcessStateType = "NEW" | "INIT" | "PENDING" | "APPROVED" | "ACTIVE" | "INACTIVE" | "REJECTED" | "REVOKED" | "INVALID"
+export type MeterDirectionType = "GENERATION" | "CONSUMPTION"
+
+export interface Metering {
+  meteringPoint: string;
+  consentId: string;
+  direction: MeterDirectionType;
+  ownValue: number;
+  totalValue: number;
+  participantId: string;
+  equipmentName: string;
+  transformer: string;
+  inverterid: string;
+  tariff_id: string;
+  street: string;
+  streetNumber: string;
+  city: string;
+  zip: string,
+  status: MeteringStateType,
+  statusCode: number,
+  registeredSince: Date,
+  gridOperatorId: string,
+  gridOperatorName: string,
+  allocationFactor: number,
+  modifiedAt: number,
+  modifiedBy: string,
+  processState: MeteringProcessStateType,
+  participantState: ParticipantState,
+  activeSince: Date,
+  inactiveSince: Date,
+  partFact: number,
+  activationCode?: string
+  activationMode: 'ONLINE' | 'OFFLINE'
+  enabled: boolean
+  tenant?: string
+}
