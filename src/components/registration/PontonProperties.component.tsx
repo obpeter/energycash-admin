@@ -15,26 +15,17 @@ const PontonPropertiesComponent: FC<PontonPropertiesComponentProps> = ({control,
   const [eegOnline, setEegOnline] = useState<boolean>(false)
 
   const online = watch ? watch("online") : false
-  const commType = useWatch({control: control, name: 'pontonInfo.pontonCommType'})
+  const [commType] = useWatch({control: control, name: ['pontonInfo.pontonCommType']})
 
   return (
     <Box className={"flex-col-mgap"} style={{padding: "16px"}} bgcolor={"background.paper"}>
 
       <h4>Ponton Verbindung</h4>
 
-      {/* eslint-disable-next-line react/jsx-no-undef */}
-      {/*<FormControlLabel*/}
-      {/*  control={*/}
-      {/*    <Checkbox*/}
-      {/*      checked={eegOnline}*/}
-      {/*      onChange={() => setEegOnline(!eegOnline)}*/}
-      {/*      inputProps={{ 'aria-label': 'controlled' }}*/}
-      {/*    />*/}
-      {/*  }*/}
-      {/*  label="EEG ist online"/>*/}
       <FormCheckboxComponent name={"online"} label="EEG ist online" control={control}/>
       <FormSelectComponent control={control} label={"Ponton Kommunikation"} name={"pontonInfo.pontonCommType"}
                            options={[
+                             {key: "NONE", value: "ignorieren / bereits konfiguriert"},
                              {key: "KEP", value: "Kep Server"},
                              {key: "MAIL", value: "E-Mail"},
                            ]} disabled={!online}></FormSelectComponent>

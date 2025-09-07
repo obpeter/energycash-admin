@@ -3,7 +3,6 @@ export interface Eeg {
   tenant: string,
   name: string;
   rcNumber: string;
-  salesTax: string;
   settlement: string;
   description: string;
   communityId: string;
@@ -15,10 +14,7 @@ export interface Eeg {
 export interface EegBusiness {
   businessInfo: {
     legal: 'verein' | 'genossenschaft' | 'gesellschaft';
-    taxNumber: string;
-    vatNumber: string;
     settlementInterval: 'MONTHLY' | "ANNUAL" | "BIANNUAL" | "QUARTER";
-    businessNr: string;
   }
 }
 
@@ -50,13 +46,13 @@ export interface EegPonton {
     password: string
     confirmPassword: string
     domain: string
-    pontonCommType: string
+    pontonCommType: 'NONE' | 'KEP' | 'MAIL'
   }
 }
 
 export type EegRegister = Eeg & EegOwner & EegPonton & EegBusiness & EegGrid
 
-export interface EegTenant { tenant: string}
+export interface EegTenant { tenant: string, rcNumber: string}
 export type PontonRegister = EegTenant & EegPonton
 
 export interface Address {
@@ -68,15 +64,11 @@ export interface Address {
 }
 
 export interface Contact {
-  owner: string;
   street: string;
   streetNumber: string;
   zip: string;
   city: string;
   phone: string;
-  web: string;
-  email: string;
-  contactPerson: string;
 }
 
 export interface AccountInfo {
@@ -233,6 +225,7 @@ export interface EegMember {
   allocationMode: "DYNAMIC" | "STATIC"
   online: boolean;
 }
+
 export interface EegParticipant {
   tenant: string;
   id: string;
@@ -294,4 +287,9 @@ export interface Metering {
   activationMode: 'ONLINE' | 'OFFLINE'
   enabled: boolean
   tenant?: string
+}
+
+export interface GridOperator {
+  id: string
+  name: string
 }

@@ -69,7 +69,7 @@ const PortalPageLayout = () => {
             </div>
           </Box>
         </Grid>
-        <Grid item xs={10} width="100%"  >
+        <Grid item xs={10} width="100%" height="100%" overflow="auto">
           <ParticipantProvider>
             <EegMemberDetailsComponent />
           </ParticipantProvider>

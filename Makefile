@@ -5,7 +5,7 @@ NPMBUILD=$(NPMCMD) run build
 
 BINARY_NAME=eeg-registration-frontend
 DOCKER=docker
-VERSION=v0.2.6
+VERSION=v0.2.10
 ORGANISATION=vfeeg-development
 GLOBAL_ORG=eegfaktura
 
