@@ -1,4 +1,4 @@
-import {User, UserManager, WebStorageStateStore} from "oidc-client-ts";
+import {User, WebStorageStateStore} from "oidc-client-ts";
 
 import { AuthProviderProps } from "react-oidc-context";
 // import {keycloakConfig} from "../../../keycloak";

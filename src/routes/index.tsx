@@ -1,9 +1,8 @@
-import React, {FC, ReactNode} from "react";
-import {Navigate, Outlet, Route} from "react-router-dom";
+import React, {ReactNode} from "react";
+import {Route} from "react-router-dom";
 import PageWrapper from "../components/layout/PageWrapper";
 import appRoutes from "./appRoutes";
 import { RouteType } from "./config";
-import {useAuth} from "react-oidc-context";
 
 const generateRoute = (routes: RouteType[]): ReactNode => {
   return routes.map((route, index) => (

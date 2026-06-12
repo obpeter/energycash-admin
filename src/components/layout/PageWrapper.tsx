@@ -1,8 +1,7 @@
-import React, {FC, PropsWithChildren, ReactElement, ReactNode, useEffect} from "react";
+import React, {ReactNode, useEffect} from "react";
 import { useDispatch } from "react-redux";
 import { setAppState } from "../../redux/features/appStateSlice";
 import {useAuth} from "react-oidc-context";
-import {Outlet} from "react-router-dom";
 
 // const ProtectedRoute:FC<PropsWithChildren> = ({children}) => {
 //   const auth = useAuth()

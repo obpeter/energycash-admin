@@ -14,6 +14,7 @@ import {OidcProvider} from "./components/layout/OidcProvider";
 import {AppConfig, globalConfigUrl} from "./config";
 import {UserManager, UserManagerSettings} from "oidc-client-ts";
 import {AuthService} from "./services/auth.service";
+import {PortalService} from "./services/portal.service";
 
 const initApiServices = (config: AppConfig): UserManager => {
 
@@ -22,12 +23,14 @@ const initApiServices = (config: AppConfig): UserManager => {
     client_id: config.resource,
     redirect_uri: window.location.origin,
     automaticSilentRenew: false,
+    loadUserInfo: true,
+    accessTokenExpiringNotificationTime: 0,
   } as UserManagerSettings;
 
   const authService = new AuthService(userManagerConfig)
 
   Api.eegService = new EegService(authService)
-
+  Api.portalService = new PortalService(authService)
 
   return authService as UserManager
 }

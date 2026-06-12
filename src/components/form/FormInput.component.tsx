@@ -1,6 +1,6 @@
 import React, {FC} from "react";
 import {Control, Controller} from "react-hook-form";
-import {FormControl, InputLabel, OutlinedInput} from "@mui/material";
+import {FormControl, FormHelperText, InputLabel, OutlinedInput} from "@mui/material";
 
 
 interface FormInputComponentProps {
@@ -17,28 +17,36 @@ interface FormInputComponentProps {
 const FormInputComponent: FC<FormInputComponentProps> = ({control, rules, label, name, disabled, ...rest}) => {
   return (
     <FormControl>
-      <InputLabel htmlFor={"component-outlined-"+name}>{label}</InputLabel>
+      <InputLabel htmlFor={"component-outlined-" + name}>{label}</InputLabel>
       <Controller
         name={name}
         control={control}
         rules={disabled ? undefined : rules}
         render={({
-                   field: { onChange, value },
-                   fieldState: { error },
+                   field: {onChange, value},
+                   fieldState: {error},
                    formState,
                  }) => (
-          <OutlinedInput
-            id={"component-outlined-"+name}
-            error={!!error}
-            onChange={onChange}
-            value={value}
-            fullWidth
-            label={label}
-            disabled={disabled}
-            {...rest}
-          />
+          <>
+            <OutlinedInput
+              id={"component-outlined-" + name}
+              error={!!error}
+              onChange={onChange}
+              value={value}
+              fullWidth
+              label={label}
+              disabled={disabled}
+              {...rest}
+            />
+            {!!error && (
+              <FormHelperText error id="accountId-error">
+                {error.message}
+              </FormHelperText>
+            )}
+          </>
         )}
       />
+      {/*{!error && <div className={"error-line"}>{error.message}</div>}*/}
     </FormControl>
   )
 }

@@ -1,6 +1,6 @@
 import React, {FC} from "react";
 import {Control, Controller} from "react-hook-form";
-import {Checkbox, FormControl, FormControlLabel, InputLabel, OutlinedInput} from "@mui/material";
+import {Checkbox, FormControl, FormControlLabel} from "@mui/material";
 
 interface FormCheckboxComponentProps {
   control: Control<any, any>;
