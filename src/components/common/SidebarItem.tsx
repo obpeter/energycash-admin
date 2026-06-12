@@ -1,7 +1,6 @@
 import {ListItemButton, ListItemIcon, useTheme} from "@mui/material";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import colorConfigs from "../../configs/colorConfigs";
 import { RootState } from "../../redux/store";
 import { RouteType } from "../../routes/config";
 

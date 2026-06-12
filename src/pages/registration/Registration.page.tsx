@@ -1,44 +1,57 @@
-import React, {FC, useState} from "react";
-import {Box, Button, Snackbar, Step, StepLabel, Stepper, Typography} from "@mui/material";
+import React, {FC, useEffect} from "react";
+import {Alert, Box, Button, IconButton, Step, StepLabel, Stepper, Typography} from "@mui/material";
 
-import {Swiper, SwiperSlide, SwiperClass} from "swiper/react";
 import {FormProvider, useForm} from "react-hook-form";
-import {AccountInfo, Address, Contact, EegRegister, Optionals} from "../../model/eeg.model";
+import {AccountInfo, EegRegister} from "../../model/eeg.model";
 import CommonEegPropertiesComponent from "../../components/registration/CommonEegProperties.component";
-import {Navigation, Pagination} from "swiper";
-import BusinessEegPropertiesComponent from "../../components/registration/BusinessEegProperties.component";
-import AddressEegPropertiesComponent from "../../components/registration/AddressEegProperties.component";
 import UserEegPropertiesComponent from "../../components/registration/UserEegProperties.component";
 import PontonPropertiesComponent from "../../components/registration/PontonProperties.component";
-import {Api} from "../../services/eeg.service";
-
+import {Api, APIError} from "../../services/eeg.service";
+import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
+import {RegistrationContext} from "../../hooks/RegistrationContext";
+import {ArrowLeft, ArrowRight} from "@mui/icons-material";
 
 const RegistrationPage: FC = () => {
-  const [swiperInstance, setSwiperInstance] = useState<SwiperClass>();
-  const [open, setOpen] = React.useState(false);
 
-  const newEeg: EegRegister = {tenant: "", rcNumber: "", communityId: "", online: false, name: "", salesTax: "", settlement: "", description: "",
+  const newEeg: EegRegister = {
+    tenant: "", rcNumber: "", communityId: "", online: false, name: "", settlement: "", description: "",
     user: {firstname: "", lastname: "", email: "", username: "", password: "", confirmPassword: ""},
-    businessInfo: {legal: "verein", taxNumber: "", vatNumber: "", businessNr: "", settlementInterval: "MONTHLY"},
+    businessInfo: {legal: "verein", settlementInterval: "MONTHLY"},
     grid: {id: "", name: "", area: "LOCAL", allocation: "DYNAMIC"},
-    pontonInfo: {host: "", password: "", username: "", port: 0, confirmPassword: "", domain: "edanet.at", pontonCommType: "KEP"},
-    accountInfo: {iban: "", sepa: false, owner:"", bankName: ""} as AccountInfo,
-    contact: {street:"", city: "", zip: "", streetNumber: "", web: "", email: "", phone: "", owner: "", contactPerson: ""},
+    pontonInfo: {
+      host: "",
+      password: "",
+      username: "",
+      port: 0,
+      confirmPassword: "",
+      domain: "edanet.at",
+      pontonCommType: "NONE"
+    },
+    accountInfo: {iban: "", sepa: false, owner: ""} as AccountInfo,
+    contact: {
+      street: "",
+      city: "",
+      zip: "",
+      streetNumber: "",
+      phone: "",
+    },
   }
-  const steps: {label: string, optional?: boolean}[] = [
-    {label: 'Common'},
-    {label: 'User'},
-    {label: 'Business'},
-    {label: 'Contact'},
-    {label: 'Interface'},
+  const steps: { label: string, optional?: boolean }[] = [
+    {label: 'Allgemein'},
+    {label: 'Betreiber'},
+    // {label: 'Business'},
+    // {label: 'Contact'},
+    {label: 'Kommunikation'},
   ];
 
   // const {handleSubmit, control, watch, formState: {errors}, reset} = useForm<EegRegister>({defaultValues: newEeg})
-  const formMethods = useForm<EegRegister>({defaultValues: newEeg})
+  const formMethods = useForm<EegRegister>({defaultValues: newEeg, mode: "all"});
 
+  const [open, setOpen] = React.useState(false);
   const [activeStep, setActiveStep] = React.useState(0);
-  const [message, setMessage] = React.useState({message: "", severity: "success"});
+  const [message, setMessage] = React.useState<{message: string, severity: "success" | "error" | "warning" | "info" | undefined}>({message: "", severity: "success"});
   const [skipped, setSkipped] = React.useState(new Set<number>());
+  const {reset, eeg, rcNumber, isExcelLoaded, excelFile, next, hasNext, prev, hasPrev, removeExcel} = React.useContext(RegistrationContext);
 
   const isStepOptional = (index: number) => {
     const step = steps[index]
@@ -48,6 +61,10 @@ const RegistrationPage: FC = () => {
   const isStepSkipped = (step: number) => {
     return skipped.has(step);
   };
+
+  useEffect(() => {
+    formMethods.reset(eeg);
+  }, [eeg])
 
   const handleNext = () => {
     let newSkipped = skipped;
@@ -81,25 +98,36 @@ const RegistrationPage: FC = () => {
 
   const handleReset = () => {
     setActiveStep(0);
-    formMethods.reset();
+    reset()
+    // formMethods.reset(eeg);
   };
 
   const onSubmit = (data: EegRegister) => {
     try {
       Api.eegService.registerEeg(trimEegRegisterData(data))
-
         .then(r => {
           setMessage({message: "Mitglied wurde angelegt!", severity: "success"})
           setOpen(true)
           handleReset()
         })
-        .catch(e => {
-          setMessage({message: "Error beim Anlegen des Mitglieds", severity: "warning"})
+        .catch((e: APIError) => {
+          console.error("ERROR-Request: ", e, "Code: ", e.code)
+          switch (e.code) {
+            case 501:
+              setMessage({message: e.message, severity: "error"})
+              break;
+            case 502:
+            case 510:
+              setMessage({message: e.message, severity: "warning"})
+              break;
+            default:
+              setMessage({message: "Error beim Anlegen des Mitglieds", severity: "error"})
+          }
           setOpen(true)
           handleReset()
         })
     } catch (e) {
-      console.log(e)
+      console.error("ERROR: ", e)
     }
   };
 
@@ -107,16 +135,12 @@ const RegistrationPage: FC = () => {
     data.name = data.name.trim()
     data.communityId = data.communityId.trim();
     data.description = data.description.trim();
-    data.salesTax = data.salesTax.trim();
     data.rcNumber = data.rcNumber.trim();
     data.settlement = data.settlement.trim();
     data.accountInfo.iban = data.accountInfo.iban.trim();
     data.accountInfo.owner = data.accountInfo.owner.trim();
-    data.contact.contactPerson = data.contact.contactPerson.trim();
     data.contact.city = data.contact.city.trim();
     data.contact.phone = data.contact.phone.trim();
-    data.contact.owner = data.contact.owner.trim();
-    data.contact.email = data.contact.email.trim();
     data.contact.streetNumber = data.contact.streetNumber.trim();
     data.contact.zip = data.contact.zip.trim();
     data.contact.street = data.contact.street.trim();
@@ -124,95 +148,134 @@ const RegistrationPage: FC = () => {
     data.pontonInfo.domain = data.pontonInfo.domain.trim();
     data.grid.name = data.grid.name.trim();
     data.grid.id = data.grid.id.trim();
-    data.businessInfo.businessNr = data.businessInfo.businessNr.trim();
-    data.businessInfo.taxNumber = data.businessInfo.taxNumber.trim();
-    data.businessInfo.vatNumber = data.businessInfo.vatNumber.trim();
     data.user.email = data.user.email.trim();
     data.user.firstname = data.user.firstname.trim();
     data.user.lastname = data.user.lastname.trim();
+    data.user.username = data.user.username.trim()
 
     return data;
   }
 
   const renderStep = (currentStep: number) => {
-    switch(currentStep) {
+    switch (currentStep) {
       case 0:
-        return <CommonEegPropertiesComponent />
+        return <CommonEegPropertiesComponent/>
       case 1:
-        return <UserEegPropertiesComponent control={formMethods.control} watch={formMethods.watch}/>
+        return <UserEegPropertiesComponent />
+      // case 2:
+      //   return <BusinessEegPropertiesComponent control={formMethods.control}/>
+      // case 3:
+      //   return <AddressEegPropertiesComponent />
       case 2:
-        return <BusinessEegPropertiesComponent control={formMethods.control}/>
-      case 3:
-        return <AddressEegPropertiesComponent control={formMethods.control}/>
-      case 4:
-        return <PontonPropertiesComponent control={formMethods.control} watch={formMethods.watch}/>
+        return <PontonPropertiesComponent />
       default:
         return <></>
     }
   }
 
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
   return (
-    <Box display="flex" flexDirection="column" height="100%" color={"primary.main"} bgcolor={"background.paper"}>
-      <Snackbar autoHideDuration={2000} open={open} onClose={() => setOpen(false)} message={message.message} security={message.severity}/>
-        {/*<div style={{display: "flex", flexDirection: "column", height: "100%", width: "100%"}}>*/}
-          {/*<div className="parent">*/}
-            <FormProvider {...formMethods} >
-            <div style={{flex: "1 1 auto"}}>
-              <Stepper activeStep={activeStep}>
-                {steps.map((step:{label: string, optional?: boolean}, index) => {
-                  const stepProps: { completed?: boolean } = {};
-                  const labelProps: {
-                    optional?: React.ReactNode;
-                  } = {};
-                  if (isStepOptional(index)) {
-                    labelProps.optional = (
-                      <Typography variant="caption">Optional</Typography>
-                    );
-                  }
-                  if (isStepSkipped(index)) {
-                    stepProps.completed = false;
-                  }
-                  return (
-                    <Step key={step.label} {...stepProps}>
-                      <StepLabel {...labelProps}>{step.label}</StepLabel>
-                    </Step>
-                  );
-                })}
-              </Stepper>
-              {Object.values(formMethods.formState.errors).map((e, i) => (
-                <div>{e.message}</div>
-              ))}
-              {renderStep(activeStep)}
-            </div>
-            </FormProvider>
-            <div style={{flex: "0 1 40px", paddingBottom: "10px"}}>
-              <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2}}>
-                <Button
-                  color="inherit"
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  sx={{ mr: 1 }}
-                >
-                  Back
-                </Button>
-                <Box sx={{ flex: '1 1 auto' }} />
-                {isStepOptional(activeStep) && (
-                  <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                    Skip
-                  </Button>
-                )}
-                {(activeStep === steps.length - 1) ?
-                  (<Button variant="contained" onClick={formMethods.handleSubmit(onSubmit)}>
-                    Finish
-                  </Button>) :
-                  (<Button variant="outlined" onClick={handleNext}>
-                    Next
-                  </Button>)
-                }
+    <Box display="flex" flexDirection="column" height="100%" color={"primary.main"} bgcolor={"background.paper"} overflow={"auto"} padding={"24px"}>
+      <Snackbar autoHideDuration={10000} open={open} onClose={handleClose}>
+        <Alert
+          onClose={handleClose}
+          severity={message.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {message.message}
+        </Alert>
+      </Snackbar>
+      <FormProvider {...formMethods} >
+        <div style={{flex: "1 1 auto"}}>
+          <Stepper activeStep={activeStep}>
+            {steps.map((step: { label: string, optional?: boolean }, index) => {
+              const stepProps: { completed?: boolean } = {};
+              const labelProps: {
+                optional?: React.ReactNode;
+              } = {};
+              if (isStepOptional(index)) {
+                labelProps.optional = (
+                  <Typography variant="caption">Optional</Typography>
+                );
+              }
+              if (isStepSkipped(index)) {
+                stepProps.completed = false;
+              }
+              return (
+                <Step key={step.label} {...stepProps}>
+                  <StepLabel {...labelProps}>{step.label}</StepLabel>
+                </Step>
+              );
+            })}
+          </Stepper>
+          {/*{Object.values(formMethods.formState.errors).map((e, i) => (*/}
+          {/*  <div>{e.message}</div>*/}
+          {/*))}*/}
+          {renderStep(activeStep)}
+        </div>
+        <div style={{flex: "0 1 40px", paddingBottom: "10px"}}>
+          <Box sx={{display: 'flex', flexDirection: 'row', pt: 2, justifyContent: 'space-between', alignItems: 'center'}}>
+            <Button
+              color="inherit"
+              disabled={activeStep === 0}
+              onClick={handleBack}
+              sx={{mr: 1}}
+            >
+              Back
+            </Button>
+            {isExcelLoaded && (
+              <Box sx={{display:'flex', flexDirection:'row', gap:'24px', paddingRight:'20px'}}>
+                {/*<IconButton onClick={() => removeExcel()}>*/}
+                {/*  <DeleteOutline/>*/}
+                {/*</IconButton>*/}
+                <Box sx={{flex: '0 0 auto'}}>
+                  <Typography fontSize={"0.8em"}>
+                    Filename: {excelFile}
+                  </Typography>
+                  <Typography fontSize={"0.8em"}>
+                    RC-Number: {rcNumber()}
+                  </Typography>
+                </Box>
+                <Box sx={{flex: '0 0 auto'}}>
+                  <IconButton disabled={!hasPrev()} onClick={() => prev()}>
+                    <ArrowLeft />
+                  </IconButton>
+                  <IconButton disabled={!hasNext()} onClick={() => next()}>
+                    <ArrowRight />
+                  </IconButton>
+                </Box>
               </Box>
-            </div>
-          {/*</div>*/}
-        {/*</div>*/}
+            )}
+            <Box sx={{flex: '0 0 auto'}}>
+            {isStepOptional(activeStep) && (
+              <Button color="inherit" onClick={handleSkip} sx={{mr: 1}}>
+                Skip
+              </Button>
+            )}
+            {(activeStep === steps.length - 1) ?
+              (<Button variant="contained" onClick={formMethods.handleSubmit(onSubmit)}>
+                Finish
+              </Button>) :
+              (<Button variant="outlined" onClick={formMethods.handleSubmit(handleNext)}>
+                Next
+              </Button>)
+            }
+            </Box>
+          </Box>
+          <span></span>
+        </div>
+      </FormProvider>
     </Box>
   )
 }

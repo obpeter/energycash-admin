@@ -5,21 +5,27 @@ NPMBUILD=$(NPMCMD) run build
 
 BINARY_NAME=eeg-registration-frontend
 DOCKER=docker
-VERSION=v0.2.4
-
+VERSION=v0.2.15
+ORGANISATION=vfeeg-development
+GLOBAL_ORG=eegfaktura
 
 all: test build
 build:
-	$(NPMCMD) run build
+	$(NPMBUILD)
 
 run:
 	$(NPMCMD) run build
 
-docker-clean:
-	$(DOCKER) rmi ghcr.io/vfeeg-development/$(BINARY_NAME):$(VERSION)
+clean:
 
-docker:
-	$(DOCKER) build -t ghcr.io/vfeeg-development/$(BINARY_NAME):$(VERSION) .
+docker-clean:
+	$(DOCKER) rmi ghcr.io/$(ORGANISATION)/$(BINARY_NAME):$(VERSION)
+	$(DOCKER) rmi ghcr.io/$(GLOBAL_ORG)/$(BINARY_NAME):latest
+
+docker: build
+	$(DOCKER) build -t ghcr.io/$(ORGANISATION)/$(BINARY_NAME):$(VERSION) .
+	$(DOCKER) image tag ghcr.io/$(ORGANISATION)/$(BINARY_NAME):$(VERSION) ghcr.io/$(GLOBAL_ORG)/$(BINARY_NAME):latest
 
 push: docker
-	$(DOCKER) push ghcr.io/vfeeg-development/$(BINARY_NAME):$(VERSION)
+	$(DOCKER) push ghcr.io/$(ORGANISATION)/$(BINARY_NAME):$(VERSION)
+	$(DOCKER) push ghcr.io/$(GLOBAL_ORG)/$(BINARY_NAME):latest

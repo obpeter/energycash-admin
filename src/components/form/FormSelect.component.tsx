@@ -1,7 +1,6 @@
 import React, {FC} from "react";
-import {FormControl, InputLabel, MenuItem, OutlinedInput, Select} from "@mui/material";
+import {FormControl, InputLabel, MenuItem, Select} from "@mui/material";
 import {Control, Controller} from "react-hook-form";
-import {SelectAllOutlined} from "@mui/icons-material";
 
 interface FormSelectComponentProps {
   control: Control<any, any>;

@@ -1,14 +1,25 @@
-import {Eeg, EegMember, EegRegister, EegUsers, PontonRegister} from "../model/eeg.model";
-import {useAuth} from "react-oidc-context";
-import {User, UserManager} from "oidc-client-ts";
+import {EegMember, EegParticipant, EegRegister, EegUsers, GridOperator, PontonRegister} from "../model/eeg.model";
 import {AuthService} from "./auth.service";
-// import {authService} from "./auth.service";
-
+import {PortalService} from "./portal.service";
 
 const ADMIN_API_SERVER = process.env.REACT_APP_ADMIN_SERVER_URL;
 
+export class APIError extends Error {
+  status: number;
+  code: number;
+
+  constructor(status: number, code: number, message: string) {
+    super(message);
+    this.status = status;
+    this.code = code;
+
+    Object.setPrototypeOf(this, APIError.prototype);
+  }
+}
+
 interface IApi {
   eegService: EegService
+  portalService: PortalService
 }
 
 export const Api = {} as IApi
@@ -45,9 +56,25 @@ export class EegService {
     return { ...secHeaders, ...headers}
   }
 
-  private handleErrors(response: Response) {
+  private async handleErrors(response: Response) {
     if (!response.ok) {
-      throw Error(response.statusText);
+      let apiError: APIError
+      const body = await response.text();
+      if (body) {
+        try {
+          const bodyData = JSON.parse(body);
+          if (bodyData.code) {
+            apiError = new APIError(response.status, bodyData.code, bodyData.message ? bodyData.message : response.statusText);
+          } else {
+            apiError = new APIError(response.status, 500, response.statusText);
+          }
+        } catch (e) {
+          apiError = new APIError(response.status, 500, response.statusText);
+        }
+      } else {
+        apiError = new APIError(response.status, 500, response.statusText);
+      }
+      throw apiError
     }
     return response;
   }
@@ -103,6 +130,37 @@ export class EegService {
     const token = await this.getUser()
     // const token = "1234"
     return await fetch(`${ADMIN_API_SERVER}/vfeeg/eeg`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    }).then(this.handleErrors).then(async res => {
+      if (res.status === 200) {
+        const data = await res.json();
+        return data;
+      }
+    });
+  }
+
+  async getParticipants(tenant: string): Promise<EegParticipant[]> {
+    const token = await this.getUser()
+    // const token = "1234"
+    return await fetch(`${ADMIN_API_SERVER}/vfeeg/participants?tenant=${tenant}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    }).then(this.handleErrors).then(async res => {
+      if (res.status === 200) {
+        const data = await res.json();
+        return data;
+      }
+    });
+  }
+
+  async getOperators(): Promise<GridOperator[]> {
+    const token = await this.getUser()
+    return await fetch(`${ADMIN_API_SERVER}/vfeeg/operators`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`

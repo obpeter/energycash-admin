@@ -33,7 +33,7 @@ export const OidcProvider: FC<PropsWithChildren & {_userManager: UserManager}> =
           ? `${window.location.pathname}?${searchParams.toString()}`
           : window.location.pathname;
         console.log("Clean Window location", newUrl)
-        window.history.replaceState({}, document.title, newUrl);
+        window.history.replaceState({}, document.title, window.location.pathname);
       },
       /**
        * we need to store the user in local storage, to access the token. The alternative would

@@ -7,16 +7,12 @@ export const OidcHandler: FC<PropsWithChildren> = ({ children }) => {
   const [hasTriedSignin, setHasTriedSignin] = useState(false);
 
   useEffect(() => {
-    console.log("Load Oidc Handler")
-  }, []);
-
-  useEffect(() => {
     (async () => {
       if (
         !hasAuthParams() &&
         !auth.isAuthenticated &&
         !auth.activeNavigator &&
-        !auth.isLoading &&
+        // !auth.isLoading &&
         !hasTriedSignin
       ) {
         await auth.signinRedirect();
@@ -46,6 +42,14 @@ export const OidcHandler: FC<PropsWithChildren> = ({ children }) => {
   }
 
   if (auth.isLoading) {
+    return (
+      <div className="full-screen-center">
+        <CircularProgress />
+      </div>
+    );
+  }
+
+  if (!auth.isAuthenticated) {
     return (
       <div className="full-screen-center">
         <CircularProgress />

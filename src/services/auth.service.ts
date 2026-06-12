@@ -1,41 +1,24 @@
-import {UserManager, UserManagerSettings, WebStorageStateStore} from "oidc-client-ts";
-
-// import {keycloakConfig} from "../keycloak";
-
-// const keycloakConfig = {
-//   url: "https://login.ourproject.at/auth/realms/VFEEG/",
-//   client_id: "at.ourproject.vfeeg.admin",
-//   // redirect_uri: "https://admin.eegfaktura.at"
-//   redirect_uri: "http://localhost:3000",
-
-// }
-
-// const oidcConfig = {
-//   authority: keycloakConfig.url,
-//   client_id: keycloakConfig.client_id,
-//   redirect_uri: keycloakConfig.redirect_uri,
-//   // client_secret: keycloakConfig.client_secret,
-//   automaticSilentRenew: false,
-//   revokeAccessTokenOnSignout: true,
-//   userStore: new WebStorageStateStore({
-//     store: sessionStorage
-//   }),
-// } as UserManagerSettings;
-
+import {UserManager} from "oidc-client-ts";
 
 export class AuthService extends UserManager {
 
-  constructor(settings: UserManagerSettings) {
-    super(settings);
-  }
+  // constructor(settings: UserManagerSettings) {
+  //   super(settings);
+  // }
 
   public async getToken() {
     const user = await this.getUser()
     if (user && user.expires_in) {
       const expiresIn = user.expires_in
+      console.log(`getToken(): Expires in: ${expiresIn}`)
       if (expiresIn < 30) {
-        await this.signinSilent()
-        return user.access_token
+        return this.signinSilent().then(user => {
+          if (user) {
+            return user.access_token
+          }
+          throw new Error("Token expired")
+        })
+        // return user.access_token
       }
       return user.access_token
     }
